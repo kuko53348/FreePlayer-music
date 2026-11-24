@@ -1,0 +1,14 @@
+---
+description: The design contract for a FletBox app
+globs: "src/**/*.js"
+alwaysApply: true
+---
+
+Read [skills/fletbox-design/SKILL.md](../../skills/fletbox-design/SKILL.md) before the work it
+describes. The same bytes sit at `.claude/skills/…` and `.qoder/skills/…` so the
+loaders find them automatically, and that mirror is generated — edit the file
+above and regenerate, never the copy.
+
+A summary of the skill here would only drift, so this rule is only a pointer.
+
+Never invent a widget or prop: `flet-box unpack <Widget>` prints the real ones.

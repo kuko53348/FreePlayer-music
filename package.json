@@ -1,0 +1,45 @@
+{
+  "name": "musicUI",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "predev": "flet-box check-api --emit-api && flet-box unpack --all --md",
+    "dev": "bash run.sh",
+    "verify": "flet-box verify && flet-box rag verify",
+    "check": "node scripts/check-app.mjs",
+    "ui": "node scripts/check-ui.mjs",
+    "lint": "flet-box lint",
+    "format": "flet-box format",
+    "fix": "flet-box audit-fix",
+    "metrics": "flet-box metrics",
+    "api": "flet-box unpack --all --md",
+    "rag:build": "flet-box rag build",
+    "rag:verify": "flet-box rag verify",
+    "rag:query": "flet-box rag query",
+    "build": "flet-box createBundle www",
+    "start": "npm run dev",
+    "android:init": "npm run build && cap add android",
+    "android:sync": "npm run build && cap sync android && npm run android:icons",
+    "android:icons": "node scripts/sync-android-icons.mjs",
+    "android:open": "cap open android",
+    "android:run": "cap run android",
+    "ios:init": "npm run build && cap add ios",
+    "ios:sync": "npm run build && cap sync ios && npm run ios:icons",
+    "ios:icons": "node scripts/sync-ios-assets.mjs",
+    "ios:open": "cap open ios",
+    "ios:run": "cap run ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/ios": "^7.0.0",
+    "flet-box": "^1.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.0",
+    "sharp": "^0.35.5"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}

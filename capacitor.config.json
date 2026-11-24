@@ -1,0 +1,10 @@
+{
+  "appId": "com.fletbox.musicui",
+  "appName": "musicUI",
+  "webDir": "www",
+  "backgroundColor": "#18181b",
+  "server": {
+    "androidScheme": "https",
+    "iosScheme": "https"
+  }
+}

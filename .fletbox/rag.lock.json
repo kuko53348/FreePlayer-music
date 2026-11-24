@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "builtAt": "2026-11-24T23:39:11.838Z",
+  "configHash": "d95d3238d6b61f1f8e7c03e16b0e6372ba7dddba206a7368a246fe0567bcb831",
+  "indexHash": "ce6d0191bb0d3ffdb857ea04da59eaae067af190a428563041142d96f42c5f40",
+  "chunkCount": 130,
+  "framework": {
+    "version": "1.1.3",
+    "apiHash": "sha256:61c07d95b567613c8fde370df52dbe786573e01ced901fbd61e275ea608441ed"
+  },
+  "sourceHashes": {
+    "src/app.js": "8a3888ca480369781397504be857cfae078eddcc49ce2d8cbe6294fb012301b4",
+    "src/components/layouts/AppBarComponent.js": "2ccc0672656d57bccfdae83247979280337f87bf20f77d4181b1331d48fd1dc1",
+    "src/components/layouts/BottomNav.js": "aa3e6b9ae9533f9f2545a459e4498125e6c5f954878ef614f77506e0624c898b",
+    "src/components/layouts/DrawerMenu.js": "f6982e40befdc8a66d97c9ce71af244381404fb7d9215e8b8ef3919119978760",
+    "src/components/layouts/Sidebar.js": "622a265b494acf5cedde14f193328943e7983cf29bb88af4fae248ebb794c5a0",
+    "src/database/themes.js": "864614efa2ef9ec63065b7b3c1f3a9e7e8de0918d3d3a033c8a2329b56ec4e58",
+    "src/screens/AboutScreen.js": "a235d66674820be1165b502c77bd5d6b63565da450212bb08f8dfb6375066faf",
+    "src/screens/HomeScreen.js": "a7974a8dae3e66c2376aae71b26f1b822a21f0ee13ff50135c9ad2822b68536a",
+    "src/screens/index.js": "d5d599991d6e61df30bb96687238de284f3e1c56a3aaf4da09a015d0327cb840",
+    "src/screens/ProfileScreen.js": "e27472cb1cd94cd9e463ef11d419401de4696ec3fa6a233b8392a6525c4d6f9a",
+    "src/screens/RootScreen.js": "63aaa39e3af38fe25a14d8b79b4f26ded922a89a735b3ddbc2c6f0574fc870de",
+    "skills/fletbox-design/SKILL.md": "e806e0bca920190828eaaf78cfabc402ce7a9101698f42983e06f9797f48ec5e",
+    "skills/fletbox-memory/SKILL.md": "e38b1159cd515daa25fffafff33e968edb2abe3250ae70c4fdafdf8f6713ea48",
+    "skills/fletbox-motion/SKILL.md": "3a60a50ee5fa18c86d8c8190945c87e75be4380e8616435eb9c6d2833ba84eaa",
+    "skills/fletbox-rules/SKILL.md": "a18b72c370042600ca214b6961789b0c7d2130357b95acaab8ca27b53dcd0204",
+    "AGENTS.md": "e9734f784dccca33d21b27ab20eb19f5e397308671194c367d417d49f8de1b2e",
+    "README.md": "f4219119fa1c1c6941ad3465d11adeac0b5fce8ff13c846133ea154bf39e2bf4"
+  }
+}

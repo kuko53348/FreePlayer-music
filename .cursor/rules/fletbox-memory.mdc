@@ -1,0 +1,14 @@
+---
+description: The project journal that lets any AI pick up where the last one stopped
+globs: "src/**/*.js"
+alwaysApply: false
+---
+
+Read [skills/fletbox-memory/SKILL.md](../../skills/fletbox-memory/SKILL.md) before the work it
+describes. The same bytes sit at `.claude/skills/…` and `.qoder/skills/…` so the
+loaders find them automatically, and that mirror is generated — edit the file
+above and regenerate, never the copy.
+
+A summary of the skill here would only drift, so this rule is only a pointer.
+
+Never invent a widget or prop: `flet-box unpack <Widget>` prints the real ones.
