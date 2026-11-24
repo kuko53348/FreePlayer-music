@@ -1,4 +1,4 @@
-import { WidgetFactory } from 'flet-box';
+import { Container, Text, Canvas } from 'flet-box';
 
 const fmtTime = (s) => {
   if (!isFinite(s) || s < 0) return '0:00';
@@ -77,44 +77,50 @@ export function Display({ title, trackKey, time, duration, playing, mixing, sour
 
       const beat = active && partyOn ? (0.4 + 0.6 * Math.abs(Math.sin(t * 4))) : 0;
       shell.style.setProperty('--beat', beat.toFixed(3));
-      shell.classList.toggle('limit', false);
       raf = requestAnimationFrame(draw);
     };
     cancelAnimationFrame(raf);
     raf = requestAnimationFrame(draw);
   };
 
-  const shell = WidgetFactory('section', {
+  const shell = Container({
+    tag: 'section',
+    unstyled: true,
     className: 'display' + (party ? ' party' : '') + (playing ? ' on' : ''),
     ref: (el) => { shellRef = el; startDraw(); },
     children: [
-      WidgetFactory('div', {
+      Container({
+        unstyled: true,
         className: 'display-top',
         children: [
-          WidgetFactory('span', { className: 'state' + (playing ? ' blink' : ''), text: playing ? '▶' : title ? '❚❚' : '■' }),
-          WidgetFactory('span', { className: 'clock', text: clock, onClick: onToggleTime }),
-          WidgetFactory('div', {
+          Text({ unstyled: true, tag: 'span', className: 'state' + (playing ? ' blink' : ''), text: playing ? '▶' : title ? '❚❚' : '■' }),
+          Text({ unstyled: true, tag: 'span', className: 'clock', text: clock, onClick: onToggleTime }),
+          Container({
+            unstyled: true,
             className: 'lamps',
             children: [
-              WidgetFactory('span', { className: 'lamp' + (source === 'cloud' ? ' on blue' : ''), text: 'NUBE' }),
-              WidgetFactory('span', { className: 'lamp' + (source === 'local' ? ' on' : ''), text: 'EN EL TELÉFONO' }),
-              WidgetFactory('span', { className: 'lamp' + (mixing ? ' on green' : ''), text: 'MEZCLANDO' }),
-              WidgetFactory('span', { className: 'lamp' + (offline ? ' on red' : ''), text: 'SIN SEÑAL' }),
+              Text({ unstyled: true, tag: 'span', className: 'lamp' + (source === 'cloud' ? ' on blue' : ''), text: 'NUBE' }),
+              Text({ unstyled: true, tag: 'span', className: 'lamp' + (source === 'local' ? ' on' : ''), text: 'EN EL TELÉFONO' }),
+              Text({ unstyled: true, tag: 'span', className: 'lamp' + (mixing ? ' on green' : ''), text: 'MEZCLANDO' }),
+              Text({ unstyled: true, tag: 'span', className: 'lamp' + (offline ? ' on red' : ''), text: 'SIN SEÑAL' }),
             ],
           }),
         ],
       }),
-      WidgetFactory('div', {
+      Container({
+        unstyled: true,
         className: 'marquee',
         onClick: onExpand,
-        child: WidgetFactory('span', {
+        child: Text({
+          unstyled: true,
+          tag: 'span',
           className: 'track-in' + (title && title.length > 34 ? ' scroll' : ''),
           text: title || 'PIXEL DECK · ELIGE UNA CANCIÓN',
         }),
       }),
-      WidgetFactory('canvas', { className: 'meter', ref: (el) => { specRef = el; startDraw(); } }),
-      WidgetFactory('canvas', { className: 'vu', ref: (el) => { vuRef = el; startDraw(); } }),
-      WidgetFactory('div', { className: 'party-tag', text: 'MODO FIESTA', style: { display: party ? '' : 'none' } }),
+      Canvas({ className: 'meter', ref: (el) => { specRef = el; startDraw(); } }),
+      Canvas({ className: 'vu', ref: (el) => { vuRef = el; startDraw(); } }),
+      Text({ unstyled: true, tag: 'div', className: 'party-tag', text: 'MODO FIESTA', style: { display: party ? '' : 'none' } }),
     ],
   });
 

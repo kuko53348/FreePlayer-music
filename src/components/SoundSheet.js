@@ -1,4 +1,4 @@
-import { WidgetFactory } from 'flet-box';
+import { Container, Text, Button, RangeInput } from 'flet-box';
 
 const EQ_LABELS = ['32', '64', '125', '250', '500', '1K', '2K', '4K', '8K', '16K'];
 const PRESETS = ['PLANO', 'ROCK', 'POP', 'VOZ', 'BAJO+', 'DJ'];
@@ -6,15 +6,17 @@ const XFADES = [[0, 'NO'], [3, '3 s'], [6, '6 s'], [10, '10 s']];
 
 export function SoundSheet({ open, onClose, party, onToggleParty }) {
   let wrapRef;
+
   const close = () => { wrapRef?.classList.remove('open'); onClose && onClose(); };
   const openSheet = () => { wrapRef?.classList.add('open'); };
 
-  const mkBand = (label, value, cls = '') => WidgetFactory('div', {
+  const mkBand = (label, value, cls = '') => Container({
+    unstyled: true,
     className: 'band ' + cls,
     children: [
-      WidgetFactory('span', { className: 'db', text: (value > 0 ? '+' : '') + Number(value).toFixed(0) }),
-      WidgetFactory('input', {
-        type: 'range', min: '-12', max: '12', step: '0.5', value: String(value),
+      Text({ unstyled: true, tag: 'span', className: 'db', text: (value > 0 ? '+' : '') + Number(value).toFixed(0) }),
+      RangeInput({
+        min: -12, max: 12, step: 0.5, value,
         onInput: (e) => {
           const db = e.target.parentElement.querySelector('.db');
           const v = parseFloat(e.target.value);
@@ -22,33 +24,37 @@ export function SoundSheet({ open, onClose, party, onToggleParty }) {
         },
         onDblClick: (e) => { e.target.value = '0'; const db = e.target.parentElement.querySelector('.db'); if (db) db.textContent = '0'; },
       }),
-      WidgetFactory('label', { text: label }),
+      Text({ unstyled: true, tag: 'label', text: label }),
     ],
   });
 
   const bands = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-  const wrap = WidgetFactory('div', {
+  const wrap = Container({
+    unstyled: true,
     className: 'sheet-wrap' + (open ? ' open' : ''),
     ref: (el) => { wrapRef = el; },
     onClick: (e) => { if (e.target === wrapRef) close(); },
-    child: WidgetFactory('div', {
+    child: Container({
+      unstyled: true,
       className: 'sheet',
       onClick: (e) => e.stopPropagation(),
       children: [
-        WidgetFactory('div', { className: 'grabber' }),
-        WidgetFactory('div', {
+        Container({ unstyled: true, className: 'grabber' }),
+        Container({
+          unstyled: true,
           className: 'sheet-head',
           children: [
-            WidgetFactory('h3', { text: 'SONIDO' }),
-            WidgetFactory('button', { className: 'pill', text: 'LISTO', onClick: close }),
+            Text({ unstyled: true, tag: 'h3', text: 'SONIDO' }),
+            Button({ unstyled: true, className: 'pill', text: 'LISTO', onClick: close }),
           ],
         }),
-
-        WidgetFactory('div', { className: 'section-title', text: 'TRANSICIÓN ENTRE CANCIONES' }),
-        WidgetFactory('div', {
+        Text({ unstyled: true, tag: 'div', className: 'section-title', text: 'TRANSICIÓN ENTRE CANCIONES' }),
+        Container({
+          unstyled: true,
           className: 'seg',
-          children: XFADES.map(([v, l], i) => WidgetFactory('button', {
+          children: XFADES.map(([v, l], i) => Button({
+            unstyled: true,
             className: i === 1 ? 'on' : '',
             text: l,
             onClick: (e) => {
@@ -57,8 +63,8 @@ export function SoundSheet({ open, onClose, party, onToggleParty }) {
             },
           })),
         }),
-
-        WidgetFactory('button', {
+        Button({
+          unstyled: true,
           className: 'party-card' + (party ? ' on' : ''),
           onClick: (e) => {
             const on = e.currentTarget.classList.toggle('on');
@@ -67,16 +73,17 @@ export function SoundSheet({ open, onClose, party, onToggleParty }) {
             onToggleParty && onToggleParty(on);
           },
           children: [
-            WidgetFactory('span', { className: 'party-title', text: `🎉 MODO FIESTA ${party ? 'ACTIVADO' : ''}` }),
-            WidgetFactory('span', { className: 'party-desc', text: 'Mezcla larga estilo DJ (cambio de graves entre canciones), orden aleatorio sin repetir y luces que siguen el ritmo.' }),
+            Text({ unstyled: true, tag: 'span', className: 'party-title', text: `🎉 MODO FIESTA ${party ? 'ACTIVADO' : ''}` }),
+            Text({ unstyled: true, tag: 'span', className: 'party-desc', text: 'Mezcla larga estilo DJ (cambio de graves entre canciones), orden aleatorio sin repetir y luces que siguen el ritmo.' }),
           ],
         }),
-
-        WidgetFactory('div', {
+        Container({
+          unstyled: true,
           className: 'section-title eq-title',
           children: [
-            document.createTextNode('ECUALIZADOR'),
-            WidgetFactory('button', {
+            Text({ unstyled: true, tag: 'span', text: 'ECUALIZADOR' }),
+            Button({
+              unstyled: true,
               className: 'pill small on',
               text: 'ON',
               onClick: (e) => {
@@ -87,11 +94,13 @@ export function SoundSheet({ open, onClose, party, onToggleParty }) {
             }),
           ],
         }),
-        WidgetFactory('div', {
+        Container({
+          unstyled: true,
           className: 'presets',
-          children: PRESETS.map((p) => WidgetFactory('button', { className: 'chip', text: p })),
+          children: PRESETS.map((p) => Button({ unstyled: true, className: 'chip', text: p })),
         }),
-        WidgetFactory('div', {
+        Container({
+          unstyled: true,
           className: 'eq-bands',
           children: [
             mkBand('PRE', 0, 'pre'),
@@ -99,7 +108,7 @@ export function SoundSheet({ open, onClose, party, onToggleParty }) {
             mkBand('MASTER', 0, 'master'),
           ],
         }),
-        WidgetFactory('p', { className: 'sheet-hint', text: 'Doble toque en un control lo deja en 0. Un limitador protege el sonido para que no se sature aunque subas el MASTER.' }),
+        Text({ unstyled: true, tag: 'p', className: 'sheet-hint', text: 'Doble toque en un control lo deja en 0. Un limitador protege el sonido para que no se sature aunque subas el MASTER.' }),
       ],
     }),
   });

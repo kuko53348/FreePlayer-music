@@ -1,4 +1,4 @@
-import { WidgetFactory } from 'flet-box';
+import { Container, Text, Button } from 'flet-box';
 
 const topFolder = (key) => key.split('/').slice(0, -1).join('/') || key.split('/')[0] || '';
 const labels = (t) => {
@@ -11,46 +11,55 @@ export function VirtualList({ items, currentKey, playing, onPick, onScrollPos })
   const renderRow = (t, i) => {
     const lb = labels(t);
     const isCur = t.key === currentKey;
-    const has = i < 4; // mock: first 4 downloaded
-    const dim = false;
-    return WidgetFactory('div', {
+    const has = i < 4;
+    return Container({
+      unstyled: true,
       className: 'vrow',
       style: { top: (i * 58) + 'px', height: '58px' },
-      child: WidgetFactory('div', {
-        className: 'row' + (isCur ? ' playing' : '') + (dim ? ' dim' : ''),
+      child: Container({
+        unstyled: true,
+        className: 'row' + (isCur ? ' playing' : ''),
         onClick: () => onPick && onPick(i),
         children: [
-          ...(isCur ? [WidgetFactory('span', {
+          ...(isCur ? [Container({
+            unstyled: true,
+            tag: 'span',
             className: 'eqbars' + (playing ? ' on' : ''),
-            children: [WidgetFactory('i'), WidgetFactory('i'), WidgetFactory('i')],
+            children: [
+              Text({ unstyled: true, tag: 'i', text: '' }),
+              Text({ unstyled: true, tag: 'i', text: '' }),
+              Text({ unstyled: true, tag: 'i', text: '' }),
+            ],
           })] : []),
-          WidgetFactory('div', {
+          Container({
+            unstyled: true,
             className: 'row-text',
             children: [
-              WidgetFactory('div', { className: 't', text: lb.main }),
-              WidgetFactory('div', { className: 's', text: lb.sub }),
+              Text({ unstyled: true, tag: 'div', className: 't', text: lb.main }),
+              Text({ unstyled: true, tag: 'div', className: 's', text: lb.sub }),
             ],
           }),
-          WidgetFactory('button', {
+          Button({
+            unstyled: true,
             className: 'dlbtn' + (has ? ' ok' : ''),
             onClick: (e) => e.stopPropagation(),
-            child: WidgetFactory('span', { text: has ? '✓' : '↓' }),
+            child: Text({ unstyled: true, tag: 'span', text: has ? '✓' : '↓' }),
           }),
         ],
       }),
     });
   };
 
-  const list = WidgetFactory('div', {
+  return Container({
+    unstyled: true,
     className: 'vlist',
     onScroll: (e) => onScrollPos && onScrollPos(e.currentTarget.scrollTop),
     child: items.length === 0
-      ? WidgetFactory('div', { className: 'empty', text: 'No hay canciones.' })
-      : WidgetFactory('div', {
+      ? Text({ unstyled: true, tag: 'div', className: 'empty', text: 'No hay canciones.' })
+      : Container({
+          unstyled: true,
           style: { height: (items.length * 58) + 'px', position: 'relative' },
           children: items.map(renderRow),
         }),
   });
-
-  return list;
 }
