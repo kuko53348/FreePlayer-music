@@ -57,17 +57,17 @@ export const PlayerScreen = () => {
   function rerenderPlaylist() {
     const visible = getVisible();
     const filtered = !!(search || folder);
-    tabsWrap.querySelectorAll('.tab[data-tab]').forEach((b) => b.classList.toggle('on', b.dataset.tab === tab));
+    tabsWrap?.querySelectorAll('.tab[data-tab]').forEach((b) => b.classList.toggle('on', b.dataset.tab === tab));
 
     chipsWrap.style.display = tab === 'cloud' ? 'flex' : 'none';
     chipsWrap.innerHTML = '';
-    const all = Button({ unstyled: true, className: 'chip' + (!folder ? ' on' : ''), text: `TODAS · ${MOCK_TRACKS.length}`, onClick: () => { folder = ''; rerenderPlaylist(); } });
+    const all = Button({ unstyled: true, className: 'chip' + (!folder ? ' on' : ''), text: `TODAS · ${MOCK_TRACKS.length}`, onPress: () => { folder = ''; rerenderPlaylist(); } });
     chipsWrap.appendChild(all);
     const folders = [...new Set(MOCK_TRACKS.map((t) => topFolder(t.key)))]
       .map((f) => [f, MOCK_TRACKS.filter((t) => topFolder(t.key) === f).length])
       .sort((a, b) => a[0].localeCompare(b[0], 'es', { numeric: true }));
     folders.forEach(([f, n]) => {
-      chipsWrap.appendChild(Button({ unstyled: true, className: 'chip' + (folder === f ? ' on' : ''), text: `${f} · ${n}`, onClick: () => { folder = folder === f ? '' : f; rerenderPlaylist(); } }));
+      chipsWrap.appendChild(Button({ unstyled: true, className: 'chip' + (folder === f ? ' on' : ''), text: `${f} · ${n}`, onPress: () => { folder = folder === f ? '' : f; rerenderPlaylist(); } }));
     });
 
     plBar.innerHTML = '';
@@ -174,19 +174,19 @@ export const PlayerScreen = () => {
             unstyled: true,
             className: 'keys',
             children: [
-              Button({ unstyled: true, className: 'key', text: '⏮', onClick: () => { qi = (qi - 1 + MOCK_TRACKS.length) % MOCK_TRACKS.length; playing = true; syncPlayer(); rerenderPlaylist(); } }),
-              Button({ unstyled: true, className: 'key play active', text: '❚❚', ref: (el) => { playBtn = el; }, onClick: () => { playing = !playing; syncPlayer(); rerenderPlaylist(); } }),
-              Button({ unstyled: true, className: 'key', text: '⏭', onClick: () => { qi = (qi + 1) % MOCK_TRACKS.length; playing = true; syncPlayer(); rerenderPlaylist(); } }),
+              Button({ unstyled: true, className: 'key', text: '⏮', onPress: () => { qi = (qi - 1 + MOCK_TRACKS.length) % MOCK_TRACKS.length; playing = true; syncPlayer(); rerenderPlaylist(); } }),
+              Button({ unstyled: true, className: 'key play active', text: '❚❚', ref: (el) => { playBtn = el; }, onPress: () => { playing = !playing; syncPlayer(); rerenderPlaylist(); } }),
+              Button({ unstyled: true, className: 'key', text: '⏭', onPress: () => { qi = (qi + 1) % MOCK_TRACKS.length; playing = true; syncPlayer(); rerenderPlaylist(); } }),
             ],
           }),
           Container({
             unstyled: true,
             className: 'toggles',
             children: [
-              Button({ unstyled: true, className: 'pill', text: 'ALEAT.', ref: (el) => { shuffleBtn = el; }, onClick: () => { shuffle = !shuffle; syncPlayer(); } }),
-              Button({ unstyled: true, className: 'pill on', text: 'REP: TODO', ref: (el) => { repeatBtn = el; }, onClick: () => { repeat = ({ off: 'all', all: 'one', one: 'off' })[repeat]; syncPlayer(); } }),
-              Button({ unstyled: true, className: 'pill on', text: 'EQ', onClick: () => soundSheet.open() }),
-              Button({ unstyled: true, className: 'pill fiesta', text: 'FIESTA', ref: (el) => { fiestaBtn = el; }, onClick: () => { party = !party; syncPlayer(); } }),
+              Button({ unstyled: true, className: 'pill', text: 'ALEAT.', ref: (el) => { shuffleBtn = el; }, onPress: () => { shuffle = !shuffle; syncPlayer(); } }),
+              Button({ unstyled: true, className: 'pill on', text: 'REP: TODO', ref: (el) => { repeatBtn = el; }, onPress: () => { repeat = ({ off: 'all', all: 'one', one: 'off' })[repeat]; syncPlayer(); } }),
+              Button({ unstyled: true, className: 'pill on', text: 'EQ', onPress: () => soundSheet.open() }),
+              Button({ unstyled: true, className: 'pill fiesta', text: 'FIESTA', ref: (el) => { fiestaBtn = el; }, onPress: () => { party = !party; syncPlayer(); } }),
             ],
           }),
         ],
@@ -201,8 +201,8 @@ export const PlayerScreen = () => {
             className: 'tabs',
             ref: (el) => { tabsWrap = el; },
             children: [
-              Button({ unstyled: true, className: 'tab on', text: '☁ NUBE', onClick: () => { tab = 'cloud'; rerenderPlaylist(); } }),
-              Button({ unstyled: true, className: 'tab', text: '↓ DESCARGAS (4)', onClick: () => { tab = 'downloads'; rerenderPlaylist(); } }),
+              Button({ unstyled: true, className: 'tab on', text: '☁ NUBE', onPress: () => { tab = 'cloud'; rerenderPlaylist(); } }),
+              Button({ unstyled: true, className: 'tab', text: '↓ DESCARGAS (4)', onPress: () => { tab = 'downloads'; rerenderPlaylist(); } }),
               Button({ unstyled: true, className: 'tab cfg', text: '⚙' }),
             ],
           }),

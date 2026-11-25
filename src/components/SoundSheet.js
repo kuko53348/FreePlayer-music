@@ -5,6 +5,7 @@ const PRESETS = ['PLANO', 'ROCK', 'POP', 'VOZ', 'BAJO+', 'DJ'];
 const XFADES = [[0, 'NO'], [3, '3 s'], [6, '6 s'], [10, '10 s']];
 
 export function SoundSheet({ open, onClose, party, onToggleParty }) {
+  /** @type {HTMLElement | undefined} */
   let wrapRef;
 
   const close = () => { wrapRef?.classList.remove('open'); onClose && onClose(); };
@@ -18,11 +19,17 @@ export function SoundSheet({ open, onClose, party, onToggleParty }) {
       RangeInput({
         min: -12, max: 12, step: 0.5, value,
         onInput: (e) => {
-          const db = e.target.parentElement.querySelector('.db');
-          const v = parseFloat(e.target.value);
+          const input = /** @type {HTMLInputElement} */ (e.target);
+          const db = input.parentElement?.querySelector('.db');
+          const v = parseFloat(input.value);
           if (db) db.textContent = (v > 0 ? '+' : '') + v.toFixed(0);
         },
-        onDblClick: (e) => { e.target.value = '0'; const db = e.target.parentElement.querySelector('.db'); if (db) db.textContent = '0'; },
+        onDblClick: (e) => {
+          const input = /** @type {HTMLInputElement} */ (e.target);
+          input.value = '0';
+          const db = input.parentElement?.querySelector('.db');
+          if (db) db.textContent = '0';
+        },
       }),
       Text({ unstyled: true, tag: 'label', text: label }),
     ],
@@ -30,15 +37,15 @@ export function SoundSheet({ open, onClose, party, onToggleParty }) {
 
   const bands = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-  const wrap = Container({
+  const wrap = /** @type {any} */ (Container({
     unstyled: true,
     className: 'sheet-wrap' + (open ? ' open' : ''),
-    ref: (el) => { wrapRef = el; },
-    onClick: (e) => { if (e.target === wrapRef) close(); },
+    ref: (el) => { wrapRef = /** @type {HTMLElement} */ (el); },
+    onPress: (e) => { if (e.target === wrapRef) close(); },
     child: Container({
       unstyled: true,
       className: 'sheet',
-      onClick: (e) => e.stopPropagation(),
+      onPress: (e) => e.stopPropagation(),
       children: [
         Container({ unstyled: true, className: 'grabber' }),
         Container({
@@ -46,7 +53,7 @@ export function SoundSheet({ open, onClose, party, onToggleParty }) {
           className: 'sheet-head',
           children: [
             Text({ unstyled: true, tag: 'h3', text: 'SONIDO' }),
-            Button({ unstyled: true, className: 'pill', text: 'LISTO', onClick: close }),
+            Button({ unstyled: true, className: 'pill', text: 'LISTO', onPress: close }),
           ],
         }),
         Text({ unstyled: true, tag: 'div', className: 'section-title', text: 'TRANSICIÓN ENTRE CANCIONES' }),
@@ -56,21 +63,23 @@ export function SoundSheet({ open, onClose, party, onToggleParty }) {
           children: XFADES.map(([v, l], i) => Button({
             unstyled: true,
             className: i === 1 ? 'on' : '',
-            text: l,
-            onClick: (e) => {
-              e.currentTarget.parentElement.querySelectorAll('button').forEach((b) => b.classList.remove('on'));
-              e.currentTarget.classList.add('on');
+            text: String(l),
+            onPress: (e) => {
+              const btn = /** @type {HTMLElement} */ (e.currentTarget);
+              btn.parentElement?.querySelectorAll('button').forEach((b) => b.classList.remove('on'));
+              btn.classList.add('on');
             },
           })),
         }),
         Button({
           unstyled: true,
           className: 'party-card' + (party ? ' on' : ''),
-          onClick: (e) => {
-            const on = e.currentTarget.classList.toggle('on');
-            const title = e.currentTarget.querySelector('.party-title');
-            if (title) title.textContent = `🎉 MODO FIESTA ${on ? 'ACTIVADO' : ''}`;
-            onToggleParty && onToggleParty(on);
+          onPress: (e) => {
+            const card = /** @type {HTMLElement} */ (e.currentTarget);
+            const onNow = card.classList.toggle('on');
+            const title = card.querySelector('.party-title');
+            if (title) title.textContent = `🎉 MODO FIESTA ${onNow ? 'ACTIVADO' : ''}`;
+            onToggleParty && onToggleParty(onNow);
           },
           children: [
             Text({ unstyled: true, tag: 'span', className: 'party-title', text: `🎉 MODO FIESTA ${party ? 'ACTIVADO' : ''}` }),
@@ -86,10 +95,11 @@ export function SoundSheet({ open, onClose, party, onToggleParty }) {
               unstyled: true,
               className: 'pill small on',
               text: 'ON',
-              onClick: (e) => {
-                const on = e.currentTarget.classList.toggle('on');
-                e.currentTarget.textContent = on ? 'ON' : 'OFF';
-                wrap.querySelector('.eq-bands')?.classList.toggle('off', !on);
+              onPress: (e) => {
+                const btn = /** @type {HTMLElement} */ (e.currentTarget);
+                const onNow = btn.classList.toggle('on');
+                btn.textContent = onNow ? 'ON' : 'OFF';
+                wrap.querySelector('.eq-bands')?.classList.toggle('off', !onNow);
               },
             }),
           ],
@@ -111,7 +121,7 @@ export function SoundSheet({ open, onClose, party, onToggleParty }) {
         Text({ unstyled: true, tag: 'p', className: 'sheet-hint', text: 'Doble toque en un control lo deja en 0. Un limitador protege el sonido para que no se sature aunque subas el MASTER.' }),
       ],
     }),
-  });
+  }));
 
   wrap.open = openSheet;
   wrap.close = close;

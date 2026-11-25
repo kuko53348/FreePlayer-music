@@ -33,7 +33,7 @@ export function Display({ title, trackKey, time, duration, playing, mixing, sour
       const t = performance.now() / 1000;
       const active = shell.classList.contains('on');
       const partyOn = shell.classList.contains('party');
-      const [w, h] = fit(sc);
+      const [w = 0, h = 0] = fit(sc);
       gs.clearRect(0, 0, w, h);
       const gap = 3, bw = (w - gap * (BARS - 1)) / BARS, seg = 4;
       for (let i = 0; i < BARS; i++) {
@@ -51,7 +51,7 @@ export function Display({ title, trackKey, time, duration, playing, mixing, sour
         if (pk[i] > 2) { gs.fillStyle = '#ffd48a'; gs.fillRect(x, h - pk[i] - 2, bw, 1.5); }
       }
 
-      const [vw, vh] = fit(vc);
+      const [vw = 0, vh = 0] = fit(vc);
       gv.clearRect(0, 0, vw, vh);
       const targetL = active ? 0.35 + 0.45 * Math.abs(Math.sin(t * 2.1)) : 0;
       const targetR = active ? 0.32 + 0.45 * Math.abs(Math.sin(t * 2.1 + 0.5)) : 0;
@@ -61,7 +61,8 @@ export function Display({ title, trackKey, time, duration, playing, mixing, sour
       if (vu.l >= vu.pl) { vu.pl = vu.l; vu.hl = now; } else if (now - vu.hl > 900) vu.pl *= 0.97;
       if (vu.r >= vu.pr) { vu.pr = vu.r; vu.hr = now; } else if (now - vu.hr > 900) vu.pr *= 0.97;
       const rowH = (vh - 4) / 2, segW = 5, segs = Math.floor((vw - 16) / segW);
-      [[vu.l, vu.pl, 'L'], [vu.r, vu.pr, 'R']].forEach(([val, peak, lbl], row) => {
+      /** @type {[number, number, string][]} */
+      ([[vu.l, vu.pl, 'L'], [vu.r, vu.pr, 'R']]).forEach(([val, peak, lbl], row) => {
         const y = row * (rowH + 4);
         gv.fillStyle = '#c7892b'; gv.font = '8px monospace'; gv.fillText(lbl, 0, y + rowH - 1);
         const lit = Math.round(val * segs), pkSeg = Math.round(peak * segs);
@@ -94,7 +95,7 @@ export function Display({ title, trackKey, time, duration, playing, mixing, sour
         className: 'display-top',
         children: [
           Text({ unstyled: true, tag: 'span', className: 'state' + (playing ? ' blink' : ''), text: playing ? '▶' : title ? '❚❚' : '■' }),
-          Text({ unstyled: true, tag: 'span', className: 'clock', text: clock, onClick: onToggleTime }),
+          Text({ unstyled: true, tag: 'span', className: 'clock', text: clock, onPress: onToggleTime }),
           Container({
             unstyled: true,
             className: 'lamps',
@@ -110,7 +111,7 @@ export function Display({ title, trackKey, time, duration, playing, mixing, sour
       Container({
         unstyled: true,
         className: 'marquee',
-        onClick: onExpand,
+        onPress: onExpand,
         child: Text({
           unstyled: true,
           tag: 'span',
@@ -120,7 +121,7 @@ export function Display({ title, trackKey, time, duration, playing, mixing, sour
       }),
       Canvas({ className: 'meter', ref: (el) => { specRef = el; startDraw(); } }),
       Canvas({ className: 'vu', ref: (el) => { vuRef = el; startDraw(); } }),
-      Text({ unstyled: true, tag: 'div', className: 'party-tag', text: 'MODO FIESTA', style: { display: party ? '' : 'none' } }),
+      Text({ unstyled: true, tag: 'div', className: 'party-tag', text: 'MODO FIESTA', display: party ? 'block' : 'none' }),
     ],
   });
 

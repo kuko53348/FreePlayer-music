@@ -15,11 +15,13 @@ export function VirtualList({ items, currentKey, playing, onPick, onScrollPos })
     return Container({
       unstyled: true,
       className: 'vrow',
-      style: { top: (i * 58) + 'px', height: '58px' },
+      position: 'absolute',
+      top: i * 58,
+      height: 58,
       child: Container({
         unstyled: true,
         className: 'row' + (isCur ? ' playing' : ''),
-        onClick: () => onPick && onPick(i),
+        onPress: () => onPick && onPick(i),
         children: [
           ...(isCur ? [Container({
             unstyled: true,
@@ -42,7 +44,7 @@ export function VirtualList({ items, currentKey, playing, onPick, onScrollPos })
           Button({
             unstyled: true,
             className: 'dlbtn' + (has ? ' ok' : ''),
-            onClick: (e) => e.stopPropagation(),
+            onPress: (e) => e.stopPropagation(),
             child: Text({ unstyled: true, tag: 'span', text: has ? '✓' : '↓' }),
           }),
         ],
@@ -53,12 +55,13 @@ export function VirtualList({ items, currentKey, playing, onPick, onScrollPos })
   return Container({
     unstyled: true,
     className: 'vlist',
-    onScroll: (e) => onScrollPos && onScrollPos(e.currentTarget.scrollTop),
+    onScroll: (e) => onScrollPos && onScrollPos(/** @type {HTMLElement} */ (e.currentTarget).scrollTop),
     child: items.length === 0
       ? Text({ unstyled: true, tag: 'div', className: 'empty', text: 'No hay canciones.' })
       : Container({
           unstyled: true,
-          style: { height: (items.length * 58) + 'px', position: 'relative' },
+          position: 'relative',
+          height: items.length * 58,
           children: items.map(renderRow),
         }),
   });
