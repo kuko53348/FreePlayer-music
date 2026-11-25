@@ -1,8 +1,8 @@
-# Pixel Deck · musicUI
+# FreePlayer-music
 
-Clon visual de la UI **Pixel Deck** (reproductor móvil) construido con [FletBox](https://github.com/kuko53348/flet-box), usando la API de widgets de FletBox directamente (sin React/Vue/JSX).
+Reproductor de música móvil construido con [FletBox](https://github.com/kuko53348/flet-box), usando la API de widgets de FletBox directamente (sin React/Vue/JSX).
 
-![Screenshot de Pixel Deck musicUI](docs/screenshot.png)
+![Screenshot de FreePlayer-music](docs/screenshot.png)
 
 ## Qué incluye
 

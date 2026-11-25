@@ -239,8 +239,8 @@ export const PlayerScreen = () => {
         children: [
           Text({
             unstyled: true, tag: 'span', className: 'brand',
-            letterSpacing: 3, fontWeight: '300', fontSize: 14, color: '#e6e8ee',
-            children: [document.createTextNode('PIXEL'), Text({ unstyled: true, tag: 'b', text: 'DECK', fontWeight: '800', color: colors.amber })],
+            letterSpacing: 2, fontWeight: '300', fontSize: 14, color: '#e6e8ee',
+            children: [document.createTextNode('FreePlayer'), Text({ unstyled: true, tag: 'b', text: '-music', fontWeight: '800', color: colors.amber })],
           }),
           Text({ unstyled: true, tag: 'span', className: 'maker', text: 'SOLIDPIXEL · HI-FI', fontSize: 9, letterSpacing: 2, color: colors.muted }),
         ],

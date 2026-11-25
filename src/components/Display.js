@@ -135,7 +135,7 @@ export function Display({ title, trackKey, time, duration, playing, mixing, sour
         unstyled: true, className: 'marquee',
         overflow: 'hidden', whiteSpace: 'nowrap', fontSize: 13, borderBottom: `1px dashed ${colors.amberDim}`, padding: '6px 0 4px', minHeight: 30, cursor: 'pointer',
         onPress: onExpand,
-        child: Text({ unstyled: true, tag: 'span', className: 'track-in' + (title && title.length > 34 ? ' scroll' : ''), text: title || 'PIXEL DECK · ELIGE UNA CANCIÓN', display: 'inline-block' }),
+        child: Text({ unstyled: true, tag: 'span', className: 'track-in' + (title && title.length > 34 ? ' scroll' : ''), text: title || 'FREEPLAYER-MUSIC · ELIGE UNA CANCIÓN', display: 'inline-block' }),
       }),
       Canvas({ className: 'meter', width: '100%', height: 40, bufferWidth: 520, bufferHeight: 78, ref: (el) => { specRef = /** @type {HTMLCanvasElement} */ (el); startDraw(); }, display: 'block', marginTop: 8 }),
       Canvas({ className: 'vu', width: '100%', height: 18, bufferWidth: 520, bufferHeight: 40, ref: (el) => { vuRef = /** @type {HTMLCanvasElement} */ (el); startDraw(); }, display: 'block', marginTop: 6 }),
