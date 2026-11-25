@@ -39,7 +39,7 @@ export const PlayerScreen = () => {
   let folder = '';
   let search = '';
   let shuffle = false;
-  let repeat = 'all';
+  let repeat = 'off';
   let party = false;
   let compact = false;
   let qi = 0;
@@ -65,9 +65,21 @@ export const PlayerScreen = () => {
     return base;
   };
 
-  let appEl, playBtn, shuffleBtn, repeatBtn, fiestaBtn;
-  let tabsWrap, chipsWrap, plBar, listMount, displayEl;
-  let clockEl, stateEl, marqueeSpan, lampMix, partyTag;
+  /** @type {any} */ let appEl;
+  /** @type {any} */ let playBtn;
+  /** @type {any} */ let shuffleBtn;
+  /** @type {any} */ let repeatBtn;
+  /** @type {any} */ let fiestaBtn;
+  /** @type {any} */ let tabsWrap;
+  /** @type {any} */ let chipsWrap;
+  /** @type {any} */ let plBar;
+  /** @type {any} */ let listMount;
+  /** @type {any} */ let displayEl;
+  /** @type {any} */ let clockEl;
+  /** @type {any} */ let stateEl;
+  /** @type {any} */ let marqueeSpan;
+  /** @type {any} */ let lampMix;
+  /** @type {any} */ let partyTag;
 
   const current = () => MOCK_TRACKS[qi] || MOCK_TRACKS[0];
 
@@ -270,8 +282,8 @@ export const PlayerScreen = () => {
             display: 'flex', justifyContent: 'space-between', gap: 6,
             children: [
               Button({ ...pillBase, className: 'pill', text: 'ALEAT.', flex: 1, ref: (el) => { shuffleBtn = el; }, onPress: () => { shuffle = !shuffle; syncPlayer(); } }),
-              Button({ ...pillBase, className: 'pill on', text: 'REP: TODO', flex: 1, ref: (el) => { repeatBtn = el; }, onPress: () => { repeat = ({ off: 'all', all: 'one', one: 'off' })[repeat]; syncPlayer(); } }),
-              Button({ ...pillBase, className: 'pill on', text: 'EQ', flex: 1, onPress: () => soundSheet.open() }),
+              Button({ ...pillBase, className: 'pill', text: 'REP: NO', flex: 1, ref: (el) => { repeatBtn = el; }, onPress: () => { repeat = ({ off: 'all', all: 'one', one: 'off' })[repeat]; syncPlayer(); } }),
+              Button({ ...pillBase, className: 'pill', text: 'EQ', flex: 1, onPress: () => soundSheet.open() }),
               Button({ ...pillBase, className: 'pill fiesta', text: 'FIESTA', flex: 1, ref: (el) => { fiestaBtn = el; }, onPress: () => { party = !party; syncPlayer(); } }),
             ],
           }),
@@ -315,9 +327,9 @@ export const PlayerScreen = () => {
   appEl.appendChild(soundSheet);
   appEl.appendChild(audio);
 
-  const tabBtns = tabsWrap?.querySelectorAll('.tab');
-  if (tabBtns?.[0]) tabBtns[0].dataset.tab = 'cloud';
-  if (tabBtns?.[1]) tabBtns[1].dataset.tab = 'downloads';
+  const tabBtns = tabsWrap ? tabsWrap.querySelectorAll('.tab') : [];
+  if (tabBtns[0]) tabBtns[0].dataset.tab = 'cloud';
+  if (tabBtns[1]) tabBtns[1].dataset.tab = 'downloads';
 
   rerenderPlaylist();
   syncPlayer();

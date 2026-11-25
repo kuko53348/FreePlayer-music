@@ -30,3 +30,4 @@ findings back.
 
 | When | Project | Result | Gates | Codes |
 | --- | --- | --- | --- | --- |
+| 2026-11-25T01:03:35.556Z | musicUI | ✗ | lint, format, ui, structure | NO_FINAL_NL, TRAILING_WS, FORMAT_NEEDED, OFF_SCALE_SPACING, OFF_SCALE_TYPE, RAW_COLOR, OFF_SCALE_RADIUS, SMALL_TAP_TARGET, HAND_WRITTEN_DOM |

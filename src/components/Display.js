@@ -9,27 +9,37 @@ const fmtTime = (s) => {
 
 export function Display({ title, trackKey, time, duration, playing, mixing, source, offline, party, showRemaining, onToggleTime, onExpand }) {
   const clock = showRemaining && isFinite(duration) ? '-' + fmtTime(duration - time) : fmtTime(time).padStart(5, '0');
-  let specRef, vuRef, shellRef;
+  /** @type {HTMLCanvasElement | undefined} */
+  let specRef;
+  /** @type {HTMLCanvasElement | undefined} */
+  let vuRef;
+  /** @type {HTMLElement | undefined} */
+  let shellRef;
+  /** @type {number | undefined} */
   let raf;
 
   const startDraw = () => {
-    if (!specRef || !vuRef || !shellRef) return;
+    if (!specRef || !vuRef || !shellRef || raf) return;
     const sc = specRef, vc = vuRef, shell = shellRef;
     const gs = sc.getContext('2d'), gv = vc.getContext('2d');
+    if (!gs || !gv) return;
     const BARS = 26;
     const lv = new Float32Array(BARS), pk = new Float32Array(BARS);
-    const vu = { l: 0, r: 0, pl: 0, pr: 0, hl: 0, hr: 0 };
+    const vu = { l: 0, r: 0, pl: 0, pr: 0 };
 
-    const fit = (c) => {
+    const fit = (/** @type {HTMLCanvasElement} */ c) => {
       const dpr = window.devicePixelRatio || 1;
       const w = c.clientWidth, h = c.clientHeight;
       if (!w || !h) return [0, 0];
-      if (c.width !== w * dpr || c.height !== h * dpr) { c.width = w * dpr; c.height = h * dpr; }
-      const ctx = c.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const bw = Math.round(w * dpr), bh = Math.round(h * dpr);
+      if (c.width !== bw || c.height !== bh) { c.width = bw; c.height = bh; }
+      const ctx = c.getContext('2d');
+      if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       return [w, h];
     };
 
     const drawSpec = (t) => {
+      if (!gs) return;
       const [w = 0, h = 0] = fit(sc);
       gs.clearRect(0, 0, w, h);
       const active = shell.classList.contains('on');
@@ -57,6 +67,7 @@ export function Display({ title, trackKey, time, duration, playing, mixing, sour
     };
 
     const drawVu = (t) => {
+      if (!gv) return;
       const [vw = 0, vh = 0] = fit(vc);
       gv.clearRect(0, 0, vw, vh);
       const active = shell.classList.contains('on');
@@ -85,16 +96,18 @@ export function Display({ title, trackKey, time, duration, playing, mixing, sour
     raf = requestAnimationFrame(loop);
   };
 
-  const lampStyle = (on, color, borderOn, shadow, extra = {}) => ({
-    fontSize: 8, border: `1px solid ${on ? borderOn : colors.amberDim}`, padding: '1px 5px',
-    borderRadius: 3, opacity: on ? 1 : 0.25, letterSpacing: 1, color: on ? color : colors.amber,
-    textShadow: on ? shadow : 'none', transition: 'opacity .25s ease', ...extra,
-  });
+  const lampBase = {
+    fontSize: 8, border: `1px solid ${colors.amberDim}`, padding: '1px 5px',
+    borderRadius: 3, opacity: 0.25, letterSpacing: 1, color: colors.amber,
+    textShadow: 'none', transition: 'opacity .25s ease, color .25s ease, border-color .25s ease, text-shadow .25s ease',
+  };
+  const lampOn = (color, borderOn, shadow) => ({ opacity: 1, color, border: `1px solid ${borderOn}`, textShadow: shadow });
 
   const shell = Container({
     unstyled: true,
+    tag: 'section',
     className: 'display' + (party ? ' party' : '') + (playing ? ' on' : ''),
-    ref: (el) => { shellRef = el; startDraw(); },
+    ref: (el) => { shellRef = /** @type {HTMLElement} */ (el); startDraw(); },
     background: 'radial-gradient(ellipse at 50% 0%, #22180a, #120d06 70%)',
     borderRadius: 12,
     padding: '10px 12px 8px', fontFamily: fonts.mono, color: colors.amber,
@@ -104,31 +117,32 @@ export function Display({ title, trackKey, time, duration, playing, mixing, sour
         unstyled: true, className: 'display-top',
         display: 'flex', alignItems: 'center', gap: 8,
         children: [
-          Text({ unstyled: true, tag: 'span', className: 'state' + (playing ? ' blink' : ''), text: playing ? '▶' : '❚❚', width: 14, fontSize: 12 }),
-          Text({ unstyled: true, tag: 'span', className: 'clock', text: clock, fontSize: 38, fontWeight: '700', letterSpacing: 1, fontVariantNumeric: 'tabular-nums', onPress: onToggleTime }),
+          Text({ unstyled: true, tag: 'span', className: 'state' + (playing ? ' blink' : ''), text: playing ? '▶' : title ? '❚❚' : '■', width: 14, fontSize: 12 }),
+          Text({ unstyled: true, tag: 'span', className: 'clock', text: clock, fontSize: 38, fontWeight: '700', letterSpacing: 1, fontVariantNumeric: 'tabular-nums', cursor: 'pointer', padding: '0 2px', onPress: onToggleTime }),
           Container({
             unstyled: true, className: 'lamps',
             marginLeft: 'auto', display: 'flex', flexDirection: 'column', gap: 3, alignItems: 'flex-end',
             children: [
-              Text({ unstyled: true, tag: 'span', className: 'lamp green' + (offline ? ' on' : ''), text: 'LOCAL', ...lampStyle(offline, '#7ddc8a', '#2c5a33', '0 0 6px rgba(125,220,138,0.6)') }),
-              Text({ unstyled: true, tag: 'span', className: 'lamp blue' + (source === 'cloud' ? ' on' : ''), text: 'NUBE', ...lampStyle(source === 'cloud', colors.blue, '#35547a', '0 0 6px rgba(120,180,255,0.6)') }),
-              Text({ unstyled: true, tag: 'span', className: 'lamp red' + (mixing ? ' on' : ''), text: 'MIX', ...lampStyle(mixing, colors.red, '#7a2a22', '0 0 6px rgba(255,90,74,0.6)') }),
+              Text({ unstyled: true, tag: 'span', className: 'lamp' + (source === 'cloud' ? ' on blue' : ''), text: 'NUBE', ...lampBase, ...(source === 'cloud' ? lampOn(colors.blue, '#35547a', '0 0 6px rgba(120,180,255,0.6)') : {}) }),
+              Text({ unstyled: true, tag: 'span', className: 'lamp' + (source === 'local' ? ' on' : ''), text: 'LOCAL', ...lampBase, ...(source === 'local' ? { opacity: 1 } : {}) }),
+              Text({ unstyled: true, tag: 'span', className: 'lamp' + (mixing ? ' on green' : ''), text: 'MIX', ...lampBase, ...(mixing ? lampOn('#7ddc8a', '#2c5a33', '0 0 6px rgba(125,220,138,0.6)') : {}) }),
+              Text({ unstyled: true, tag: 'span', className: 'lamp' + (offline ? ' on red' : ''), text: 'SIN SEÑAL', ...lampBase, ...(offline ? lampOn(colors.red, '#7a2a22', '0 0 6px rgba(255,90,74,0.6)') : {}) }),
             ],
           }),
         ],
       }),
-      Canvas({ className: 'vu', width: 400, height: 18, ref: (el) => { vuRef = el; startDraw(); } }),
       Container({
         unstyled: true, className: 'marquee',
-        overflow: 'hidden', whiteSpace: 'nowrap', fontSize: 13, borderBottom: `1px dashed ${colors.amberDim}`, padding: '6px 0 4px',
+        overflow: 'hidden', whiteSpace: 'nowrap', fontSize: 13, borderBottom: `1px dashed ${colors.amberDim}`, padding: '6px 0 4px', minHeight: 30, cursor: 'pointer',
         onPress: onExpand,
-        child: Text({ unstyled: true, tag: 'span', className: 'track-in', text: title, display: 'inline-block' }),
+        child: Text({ unstyled: true, tag: 'span', className: 'track-in' + (title && title.length > 34 ? ' scroll' : ''), text: title || 'PIXEL DECK · ELIGE UNA CANCIÓN', display: 'inline-block' }),
       }),
-      Canvas({ className: 'meter', width: 400, height: 40, ref: (el) => { specRef = el; startDraw(); } }),
+      Canvas({ className: 'meter', width: '100%', height: 40, bufferWidth: 520, bufferHeight: 78, ref: (el) => { specRef = /** @type {HTMLCanvasElement} */ (el); startDraw(); }, display: 'block', marginTop: 8 }),
+      Canvas({ className: 'vu', width: '100%', height: 18, bufferWidth: 520, bufferHeight: 40, ref: (el) => { vuRef = /** @type {HTMLCanvasElement} */ (el); startDraw(); }, display: 'block', marginTop: 6 }),
       Text({ unstyled: true, tag: 'div', className: 'party-tag', text: 'MODO FIESTA', position: 'absolute', right: 12, bottom: 6, fontSize: 8, letterSpacing: 2, color: colors.amber, textShadow: `0 0 6px ${colors.amberGlow}`, display: party ? 'block' : 'none' }),
     ],
   });
 
-  shell._cleanup = () => { if (raf) cancelAnimationFrame(raf); };
+  /** @type {any} */ (shell)._cleanup = () => { if (raf) cancelAnimationFrame(raf); };
   return shell;
 }

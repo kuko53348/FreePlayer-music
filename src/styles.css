@@ -46,6 +46,11 @@ button { font-family: inherit; }
   border-color: rgba(255, 180, 58, calc(0.35 + var(--beat, 0) * 0.6));
   box-shadow: inset 0 2px 10px rgba(0,0,0,0.9), 0 0 calc(6px + var(--beat, 0) * 28px) rgba(255, 170, 40, calc(0.2 + var(--beat, 0) * 0.55));
 }
+.display::after {
+  content: ""; position: absolute; inset: 0; border-radius: 12px; pointer-events: none;
+  background: repeating-linear-gradient(180deg, rgba(0,0,0,0.18) 0 2px, transparent 2px 4px);
+  mix-blend-mode: multiply;
+}
 
 .app.party {
   background:
@@ -75,32 +80,37 @@ input[type=range]::-webkit-slider-thumb {
 .band.master input[type=range]::-webkit-slider-thumb { background: linear-gradient(90deg, #a3742a, #ffd48a, #a3742a); }
 
 /* Interactive states */
-.key { transition: transform .08s ease, box-shadow .12s ease, background .12s ease, height .3s ease, width .3s ease; box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 3px 4px rgba(0,0,0,0.55); }
+.key { cursor: pointer; transition: transform .08s ease, box-shadow .12s ease, background .12s ease, height .3s ease, width .3s ease; box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 3px 4px rgba(0,0,0,0.55); }
 .key:active { transform: translateY(2px) scale(0.96) !important; background: linear-gradient(#22242a, #2e3138) !important; box-shadow: inset 0 2px 6px rgba(0,0,0,0.7), 0 0 0 rgba(0,0,0,0) !important; }
 .key.play.active { box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 3px 4px rgba(0,0,0,0.55), 0 0 18px rgba(255,170,40,0.25); animation: glow 2.4s ease-in-out infinite; }
-.pill { color: var(--muted); transition: transform .08s ease, color .2s ease, box-shadow .2s ease; }
+.pill { cursor: pointer; color: var(--muted); transition: transform .08s ease, color .2s ease, box-shadow .2s ease; }
 .pill:active { transform: scale(0.94) !important; box-shadow: inset 0 2px 5px rgba(0,0,0,0.7) !important; }
 .pill.on { color: var(--amber) !important; text-shadow: 0 0 5px var(--amber-glow); box-shadow: inset 0 0 10px rgba(255,170,40,0.12); }
 .pill:disabled { opacity: 0.55; }
 .pill.fiesta.on { color: #fff !important; border-color: transparent !important; text-shadow: none; background: linear-gradient(90deg, #ff3d7f, #ffb43a, #3dd6ff, #a45cff, #ff3d7f) !important; background-size: 300% 100%; animation: rainbow 3s linear infinite; }
 
-.tab { background: #17181d; color: var(--muted); transition: background .2s ease, color .2s ease; }
+.tab { cursor: pointer; background: #17181d; color: var(--muted); transition: background .2s ease, color .2s ease; }
 .tab:active { filter: brightness(1.3); }
 .tab.on { background: #22242b; color: var(--amber); text-shadow: 0 0 5px var(--amber-glow); }
 
-.chip { transition: background .2s ease, color .2s ease, transform .08s ease; }
+.chip { cursor: pointer; transition: background .2s ease, color .2s ease, transform .08s ease; }
 .chip:active { transform: scale(0.94); }
 .chip.on { box-shadow: 0 0 10px rgba(255,170,40,0.35); }
 
+.row { cursor: pointer; }
 .row:active { background: #221c10; }
 .eqbars.on i { animation: eqb .9s ease-in-out infinite; }
 .eqbars.on i:nth-child(2) { animation-delay: -.3s; }
 .eqbars.on i:nth-child(3) { animation-delay: -.6s; }
-.dlbtn { transition: transform .1s ease; }
+.dlbtn { cursor: pointer; transition: transform .1s ease; }
 .dlbtn:active { transform: scale(0.85); }
 .dlbtn.ok span { animation: popIn .35s cubic-bezier(.2,1.6,.4,1); }
 
 .pl-head input:focus { border-color: var(--amber-dim); }
+.pl-head::after { content: "⌕"; position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: #5f6470; font-size: 16px; pointer-events: none; }
+.pl-bar .count { flex: 1; }
+.seekrow span { width: 36px; }
+.seekrow span:last-child { text-align: right; }
 
 .vlist::-webkit-scrollbar { width: 4px; }
 .vlist::-webkit-scrollbar-thumb { background: #3a3d45; border-radius: 2px; }
