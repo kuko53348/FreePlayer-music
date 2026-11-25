@@ -96,8 +96,7 @@ export function Display({ title, trackKey, time, duration, playing, mixing, sour
     className: 'display' + (party ? ' party' : '') + (playing ? ' on' : ''),
     ref: (el) => { shellRef = el; startDraw(); },
     background: 'radial-gradient(ellipse at 50% 0%, #22180a, #120d06 70%)',
-    borderRadius: 12, border: '1px solid #000',
-    boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.05)',
+    borderRadius: 12,
     padding: '10px 12px 8px', fontFamily: fonts.mono, color: colors.amber,
     textShadow: `0 0 6px ${colors.amberGlow}`, position: 'relative',
     children: [

@@ -212,7 +212,7 @@ export const PlayerScreen = () => {
   });
   audio.style.display = 'none';
 
-  const pillBase = { unstyled: true, height: 30, padding: '0 12px', borderRadius: 15, border: '1px solid #000', background: 'linear-gradient(#30333a, #22242a)', color: colors.muted, fontSize: 10, letterSpacing: 1, fontWeight: '700', whiteSpace: 'nowrap' };
+  const pillBase = { unstyled: true, height: 30, padding: '0 12px', borderRadius: 15, border: '1px solid #000', background: 'linear-gradient(#30333a, #22242a)', fontSize: 10, letterSpacing: 1, fontWeight: '700', whiteSpace: 'nowrap' };
 
   appEl = Container({
     unstyled: true, className: 'app' + (party ? ' party' : ''),
@@ -270,8 +270,8 @@ export const PlayerScreen = () => {
             display: 'flex', justifyContent: 'space-between', gap: 6,
             children: [
               Button({ ...pillBase, className: 'pill', text: 'ALEAT.', flex: 1, ref: (el) => { shuffleBtn = el; }, onPress: () => { shuffle = !shuffle; syncPlayer(); } }),
-              Button({ ...pillBase, className: 'pill on', text: 'REP: TODO', flex: 1, color: colors.amber, ref: (el) => { repeatBtn = el; }, onPress: () => { repeat = ({ off: 'all', all: 'one', one: 'off' })[repeat]; syncPlayer(); } }),
-              Button({ ...pillBase, className: 'pill on', text: 'EQ', flex: 1, color: colors.amber, onPress: () => soundSheet.open() }),
+              Button({ ...pillBase, className: 'pill on', text: 'REP: TODO', flex: 1, ref: (el) => { repeatBtn = el; }, onPress: () => { repeat = ({ off: 'all', all: 'one', one: 'off' })[repeat]; syncPlayer(); } }),
+              Button({ ...pillBase, className: 'pill on', text: 'EQ', flex: 1, onPress: () => soundSheet.open() }),
               Button({ ...pillBase, className: 'pill fiesta', text: 'FIESTA', flex: 1, ref: (el) => { fiestaBtn = el; }, onPress: () => { party = !party; syncPlayer(); } }),
             ],
           }),
@@ -288,9 +288,9 @@ export const PlayerScreen = () => {
             display: 'flex', gap: 4, padding: '8px 8px 0',
             ref: (el) => { tabsWrap = el; },
             children: [
-              Button({ unstyled: true, className: 'tab on', text: '☁ NUBE', height: 34, padding: '0 12px', borderRadius: '9px 9px 0 0', border: '1px solid #000', borderBottom: 'none', background: '#22242b', color: colors.amber, fontSize: 11, letterSpacing: 1.2, fontWeight: '800', onPress: () => { tab = 'cloud'; rerenderPlaylist(); } }),
-              Button({ unstyled: true, className: 'tab', text: '↓ DESCARGAS (4)', height: 34, padding: '0 12px', borderRadius: '9px 9px 0 0', border: '1px solid #000', borderBottom: 'none', background: '#17181d', color: colors.muted, fontSize: 11, letterSpacing: 1.2, fontWeight: '800', onPress: () => { tab = 'downloads'; rerenderPlaylist(); } }),
-              Button({ unstyled: true, className: 'tab cfg', text: '⚙', height: 34, padding: '0 12px', borderRadius: '9px 9px 0 0', border: '1px solid #000', borderBottom: 'none', background: '#17181d', color: colors.muted, fontSize: 15, marginLeft: 'auto' }),
+              Button({ unstyled: true, className: 'tab on', text: '☁ NUBE', height: 34, padding: '0 12px', borderRadius: '9px 9px 0 0', border: '1px solid #000', borderBottom: 'none', fontSize: 11, letterSpacing: 1.2, fontWeight: '800', onPress: () => { tab = 'cloud'; rerenderPlaylist(); } }),
+              Button({ unstyled: true, className: 'tab', text: '↓ DESCARGAS (4)', height: 34, padding: '0 12px', borderRadius: '9px 9px 0 0', border: '1px solid #000', borderBottom: 'none', fontSize: 11, letterSpacing: 1.2, fontWeight: '800', onPress: () => { tab = 'downloads'; rerenderPlaylist(); } }),
+              Button({ unstyled: true, className: 'tab cfg', text: '⚙', height: 34, padding: '0 12px', borderRadius: '9px 9px 0 0', border: '1px solid #000', borderBottom: 'none', fontSize: 15, marginLeft: 'auto', onPress: () => {} }),
             ],
           }),
           Container({

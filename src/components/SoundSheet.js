@@ -40,7 +40,7 @@ export function SoundSheet({ open, onClose, party, onToggleParty }) {
 
   const wrap = /** @type {any} */ (Container({
     unstyled: true, className: 'sheet-wrap' + (open ? ' open' : ''),
-    position: 'fixed', inset: 0, zIndex: 25, background: 'rgba(0,0,0,0)', pointerEvents: open ? 'auto' : 'none',
+    position: 'fixed', inset: 0, zIndex: 25, background: 'rgba(0,0,0,0)',
     ref: (el) => { wrapRef = /** @type {HTMLElement} */ (el); },
     onPress: (e) => { if (e.target === wrapRef) close(); },
     child: Container({
