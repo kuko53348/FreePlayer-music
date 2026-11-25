@@ -1,7 +1,14 @@
-import { Container, Text, Button, Input, RangeInput } from 'flet-box';
+import { Audio, Container, Text, Button, Input, RangeInput } from 'flet-box';
 import { Display } from '../components/Display.js';
 import { SoundSheet } from '../components/SoundSheet.js';
 import { VirtualList } from '../components/VirtualList.js';
+
+const DEMO_SRCS = [
+  'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+  'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+  'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+  'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
+];
 
 const MOCK_TRACKS = [
   { key: 'ROCK/Queen/Bohemian Rhapsody.mp3', title: 'Bohemian Rhapsody', artist: 'Queen', album: 'A Night at the Opera' },
@@ -16,7 +23,7 @@ const MOCK_TRACKS = [
   { key: 'POP/Michael Jackson/Billie Jean.mp3', title: 'Billie Jean', artist: 'Michael Jackson', album: 'Thriller' },
   { key: 'POP/The Weeknd/Blinding Lights.mp3', title: 'Blinding Lights', artist: 'The Weeknd', album: 'After Hours' },
   { key: 'ROCK/Soda Stereo/De Musica Ligera.mp3', title: 'De Música Ligera', artist: 'Soda Stereo', album: 'Canción Animal' },
-];
+].map((t, i) => ({ ...t, src: DEMO_SRCS[i % DEMO_SRCS.length] }));
 
 const topFolder = (key) => key.split('/')[0] || 'MÚSICA';
 const fmtTime = (s) => {
@@ -26,7 +33,7 @@ const fmtTime = (s) => {
 };
 
 export const PlayerScreen = () => {
-  let playing = true;
+  let playing = false;
   let tab = 'cloud';
   let folder = '';
   let search = '';
@@ -36,7 +43,18 @@ export const PlayerScreen = () => {
   let compact = false;
   let qi = 0;
   let showRemaining = false;
+  let pos = 0;
+  let dur = 0;
   let soundSheet;
+
+  /** @type {any} */
+  let audio;
+  /** @type {HTMLInputElement | undefined} */
+  let seekRef;
+  /** @type {HTMLElement | undefined} */
+  let seekCurEl;
+  /** @type {HTMLElement | undefined} */
+  let seekDurEl;
 
   const getVisible = () => {
     const words = search.toLowerCase().split(' ').filter(Boolean);
@@ -51,8 +69,64 @@ export const PlayerScreen = () => {
   let clockEl, stateEl, marqueeSpan, lampMix, partyTag;
 
   const current = () => MOCK_TRACKS[qi] || MOCK_TRACKS[0];
-  const pos = 83;
-  const dur = 354;
+
+  const updateSeekUI = () => {
+    const pct = dur > 0 ? (pos / dur) * 100 : 0;
+    if (seekRef) {
+      seekRef.value = String(Math.round((pct / 100) * 1000));
+      seekRef.style.setProperty('--p', pct + '%');
+    }
+    if (seekCurEl) seekCurEl.textContent = fmtTime(pos);
+    if (seekDurEl) seekDurEl.textContent = fmtTime(dur);
+    if (clockEl) clockEl.textContent = showRemaining ? '-' + fmtTime(Math.max(0, dur - pos)) : fmtTime(pos).padStart(5, '0');
+  };
+
+  const loadTrack = (index, autoplay = false) => {
+    qi = ((index % MOCK_TRACKS.length) + MOCK_TRACKS.length) % MOCK_TRACKS.length;
+    const track = current();
+    pos = 0;
+    dur = 0;
+    if (audio) {
+      audio.src = track.src;
+      audio.load?.();
+      if (autoplay) {
+        audio.playAudio?.();
+        playing = true;
+      } else {
+        audio.pauseAudio?.();
+        playing = false;
+      }
+    }
+    syncPlayer();
+    rerenderPlaylist();
+  };
+
+  const nextTrack = () => {
+    if (shuffle || party) {
+      let next = qi;
+      if (MOCK_TRACKS.length > 1) {
+        while (next === qi) next = Math.floor(Math.random() * MOCK_TRACKS.length);
+      }
+      loadTrack(next, true);
+      return;
+    }
+    if (qi >= MOCK_TRACKS.length - 1) {
+      if (repeat === 'all') loadTrack(0, true);
+      else { playing = false; audio?.pauseAudio?.(); syncPlayer(); }
+      return;
+    }
+    loadTrack(qi + 1, true);
+  };
+
+  const prevTrack = () => {
+    if (pos > 3) {
+      audio?.seekTo?.(0);
+      pos = 0;
+      updateSeekUI();
+      return;
+    }
+    loadTrack(qi - 1, true);
+  };
 
   function rerenderPlaylist() {
     const visible = getVisible();
@@ -85,10 +159,7 @@ export const PlayerScreen = () => {
       playing,
       onPick: (i) => {
         const real = MOCK_TRACKS.findIndex((t) => t.key === visible[i].key);
-        if (real >= 0) qi = real;
-        playing = true;
-        syncPlayer();
-        rerenderPlaylist();
+        if (real >= 0) loadTrack(real, true);
       },
       onScrollPos: (y) => {
         const next = y > 80;
@@ -113,14 +184,12 @@ export const PlayerScreen = () => {
     stateEl.classList.toggle('blink', playing);
     lampMix.classList.toggle('on', party);
     if (partyTag) partyTag.style.display = party ? '' : 'none';
-    clockEl.textContent = showRemaining ? '-' + fmtTime(dur - pos) : fmtTime(pos).padStart(5, '0');
     marqueeSpan.textContent = `${qi + 1}. ${cur.title.toUpperCase()}`;
     marqueeSpan.className = 'track-in' + (marqueeSpan.textContent.length > 34 ? ' scroll' : '');
+    updateSeekUI();
     const pc = soundSheet?.querySelector('.party-card');
     if (pc) { pc.classList.toggle('on', party); const pt = pc.querySelector('.party-title'); if (pt) pt.textContent = `🎉 MODO FIESTA ${party ? 'ACTIVADO' : ''}`; }
   }
-
-  const pct = (pos / dur) * 100;
 
   displayEl = Display({
     title: `${qi + 1}. ${current().title.toUpperCase()}`,
@@ -135,6 +204,23 @@ export const PlayerScreen = () => {
   marqueeSpan = displayEl.querySelector('.marquee span');
   lampMix = displayEl.querySelectorAll('.lamp')[2];
   partyTag = displayEl.querySelector('.party-tag');
+
+  audio = Audio({
+    src: current().src,
+    onTimeUpdate: (currentTime, durationTime) => {
+      pos = currentTime || 0;
+      if (durationTime) dur = durationTime;
+      updateSeekUI();
+    },
+    onLoad: (d) => { dur = d || dur; updateSeekUI(); },
+    onPlay: () => { playing = true; syncPlayer(); rerenderPlaylist(); },
+    onPause: () => { playing = false; syncPlayer(); rerenderPlaylist(); },
+    onEnd: () => {
+      if (repeat === 'one') { audio.seekTo?.(0); audio.playAudio?.(); return; }
+      nextTrack();
+    },
+  });
+  audio.style.display = 'none';
 
   appEl = Container({
     unstyled: true,
@@ -157,12 +243,23 @@ export const PlayerScreen = () => {
         unstyled: true,
         className: 'seekrow',
         children: [
-          Text({ unstyled: true, tag: 'span', text: fmtTime(pos) }),
+          Text({ unstyled: true, tag: 'span', text: '0:00', ref: (el) => { seekCurEl = /** @type {HTMLElement} */ (el); } }),
           RangeInput({
-            min: 0, max: 1000, value: Math.round(pct * 10),
-            ref: (el) => { el.style.setProperty('--p', pct + '%'); },
+            min: 0, max: 1000, value: 0,
+            ref: (el) => { seekRef = /** @type {HTMLInputElement} */ (el); el.style.setProperty('--p', '0%'); },
+            onInput: (e) => {
+              const input = /** @type {HTMLInputElement} */ (e.target);
+              const pct = Number(input.value) / 1000;
+              input.style.setProperty('--p', (pct * 100) + '%');
+              if (dur > 0) {
+                const next = pct * dur;
+                pos = next;
+                audio.seekTo?.(next);
+                updateSeekUI();
+              }
+            },
           }),
-          Text({ unstyled: true, tag: 'span', text: fmtTime(dur) }),
+          Text({ unstyled: true, tag: 'span', text: '0:00', ref: (el) => { seekDurEl = /** @type {HTMLElement} */ (el); } }),
         ],
       }),
       Container({
@@ -174,9 +271,12 @@ export const PlayerScreen = () => {
             unstyled: true,
             className: 'keys',
             children: [
-              Button({ unstyled: true, className: 'key', text: '⏮', onPress: () => { qi = (qi - 1 + MOCK_TRACKS.length) % MOCK_TRACKS.length; playing = true; syncPlayer(); rerenderPlaylist(); } }),
-              Button({ unstyled: true, className: 'key play active', text: '❚❚', ref: (el) => { playBtn = el; }, onPress: () => { playing = !playing; syncPlayer(); rerenderPlaylist(); } }),
-              Button({ unstyled: true, className: 'key', text: '⏭', onPress: () => { qi = (qi + 1) % MOCK_TRACKS.length; playing = true; syncPlayer(); rerenderPlaylist(); } }),
+              Button({ unstyled: true, className: 'key', text: '⏮', onPress: prevTrack }),
+              Button({ unstyled: true, className: 'key play', text: '▶', ref: (el) => { playBtn = el; }, onPress: () => {
+                if (playing) { audio.pauseAudio?.(); }
+                else { audio.playAudio?.(); }
+              } }),
+              Button({ unstyled: true, className: 'key', text: '⏭', onPress: nextTrack }),
             ],
           }),
           Container({
@@ -226,6 +326,7 @@ export const PlayerScreen = () => {
 
   soundSheet = SoundSheet({ open: false, onClose: () => {}, party, onToggleParty: (on) => { party = on; syncPlayer(); } });
   appEl.appendChild(soundSheet);
+  appEl.appendChild(audio);
 
   const tabBtns = tabsWrap.querySelectorAll('.tab');
   if (tabBtns[0]) tabBtns[0].dataset.tab = 'cloud';
