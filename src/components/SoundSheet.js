@@ -42,6 +42,7 @@ export function SoundSheet({ open, onClose, party, onToggleParty }) {
     unstyled: true, className: 'sheet-wrap' + (open ? ' open' : ''),
     position: 'fixed', inset: 0, zIndex: 25, background: 'rgba(0,0,0,0)',
     ref: (el) => { wrapRef = /** @type {HTMLElement} */ (el); },
+    disableTransform: true,
     onPress: (e) => { if (e.target === wrapRef) close(); },
     child: Container({
       unstyled: true, className: 'sheet',
@@ -49,6 +50,7 @@ export function SoundSheet({ open, onClose, party, onToggleParty }) {
       background: 'linear-gradient(#2a2c33, #1b1c21)', borderTop: '1px solid #000', borderRadius: '18px 18px 0 0',
       padding: '8px 14px calc(env(safe-area-inset-bottom) + 18px)',
       boxShadow: '0 -10px 40px rgba(0,0,0,0.6)',
+      disableTransform: true,
       onPress: (e) => e.stopPropagation(),
       children: [
         Container({ unstyled: true, className: 'grabber', width: 40, height: 4, borderRadius: 2, background: '#4a4d56', margin: '4px auto 10px' }),
