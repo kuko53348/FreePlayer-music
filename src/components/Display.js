@@ -1,4 +1,5 @@
 import { Container, Text, Canvas } from 'flet-box';
+import { colors, fonts } from '../theme.js';
 
 const fmtTime = (s) => {
   if (!isFinite(s) || s < 0) return '0:00';
@@ -23,107 +24,112 @@ export function Display({ title, trackKey, time, duration, playing, mixing, sour
       const dpr = window.devicePixelRatio || 1;
       const w = c.clientWidth, h = c.clientHeight;
       if (!w || !h) return [0, 0];
-      if (c.width !== Math.round(w * dpr)) { c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); }
-      c.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (c.width !== w * dpr || c.height !== h * dpr) { c.width = w * dpr; c.height = h * dpr; }
+      const ctx = c.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       return [w, h];
     };
-    const color = (l) => (l > 0.82 ? '#ff6a3a' : l > 0.58 ? '#ffc04a' : '#ffa62b');
 
-    const draw = () => {
-      const t = performance.now() / 1000;
-      const active = shell.classList.contains('on');
-      const partyOn = shell.classList.contains('party');
+    const drawSpec = (t) => {
       const [w = 0, h = 0] = fit(sc);
       gs.clearRect(0, 0, w, h);
-      const gap = 3, bw = (w - gap * (BARS - 1)) / BARS, seg = 4;
+      const active = shell.classList.contains('on');
+      const festa = shell.classList.contains('party');
+      const bass = active ? (0.35 + 0.65 * (0.5 + 0.5 * Math.sin(t * 0.0024))) : 0;
+      const beat = festa ? Math.pow(Math.max(0, Math.sin(t * 0.0065)), 4) : 0;
+      shell.style.setProperty('--beat', beat.toFixed(3));
+      shell.classList.toggle('limit', active && (0.55 + bass * 0.5 + beat * 0.2) > 0.92);
+      const gap = 2, bw = (w - gap * (BARS - 1)) / BARS;
       for (let i = 0; i < BARS; i++) {
-        const base = active ? (0.25 + 0.55 * Math.abs(Math.sin(t * 1.7 + i * 0.45)) * (0.5 + 0.5 * Math.sin(t * 0.7 + i * 0.18))) : 0.02;
-        const v = base;
-        lv[i] = v > lv[i] ? v : lv[i] * 0.86 + v * 0.14;
-        const bh = Math.round((lv[i] * h) / seg) * seg;
-        pk[i] = Math.max(pk[i] - 0.45, bh);
-        const x = i * (bw + gap);
-        for (let y = h - seg; y >= h - bh; y -= seg) {
-          gs.fillStyle = color(1 - y / h);
-          gs.fillRect(x, y + 1, bw, seg - 1.5);
+        const f = i / BARS;
+        let tgt = 0;
+        if (active) {
+          const wave = 0.5 + 0.5 * Math.sin(t * 0.003 + i * 0.55) * Math.cos(t * 0.0017 + i * 0.22);
+          tgt = Math.min(1, (0.18 + (1 - f) * 0.65 * bass + f * 0.45 * (1 - bass * 0.5)) * wave + beat * (1 - f) * 0.35);
         }
-        gs.globalAlpha = 0.12; gs.fillStyle = '#ffa62b'; gs.fillRect(x, h - 2, bw, 2); gs.globalAlpha = 1;
-        if (pk[i] > 2) { gs.fillStyle = '#ffd48a'; gs.fillRect(x, h - pk[i] - 2, bw, 1.5); }
+        lv[i] += (tgt - lv[i]) * (tgt > lv[i] ? 0.45 : 0.07);
+        pk[i] = Math.max(lv[i], pk[i] - 0.003);
+        const x = i * (bw + gap), bh = lv[i] * h, y = h - bh;
+        gs.fillStyle = `rgba(255,180,60,${0.25 + lv[i] * 0.75})`;
+        gs.fillRect(x, y, bw, bh);
+        gs.fillStyle = '#ffe0a0';
+        gs.fillRect(x, Math.max(0, h - pk[i] * h - 2), bw, 2);
       }
+    };
 
+    const drawVu = (t) => {
       const [vw = 0, vh = 0] = fit(vc);
       gv.clearRect(0, 0, vw, vh);
-      const targetL = active ? 0.35 + 0.45 * Math.abs(Math.sin(t * 2.1)) : 0;
-      const targetR = active ? 0.32 + 0.45 * Math.abs(Math.sin(t * 2.1 + 0.5)) : 0;
-      vu.l = targetL > vu.l ? vu.l + (targetL - vu.l) * 0.6 : vu.l * 0.92;
-      vu.r = targetR > vu.r ? vu.r + (targetR - vu.r) * 0.6 : vu.r * 0.92;
-      const now = performance.now();
-      if (vu.l >= vu.pl) { vu.pl = vu.l; vu.hl = now; } else if (now - vu.hl > 900) vu.pl *= 0.97;
-      if (vu.r >= vu.pr) { vu.pr = vu.r; vu.hr = now; } else if (now - vu.hr > 900) vu.pr *= 0.97;
-      const rowH = (vh - 4) / 2, segW = 5, segs = Math.floor((vw - 16) / segW);
+      const active = shell.classList.contains('on');
+      const festa = shell.classList.contains('party');
+      const base = active ? 0.25 + 0.45 * (0.5 + 0.5 * Math.sin(t * 0.0021)) : 0;
+      const kick = festa && active ? Math.pow(Math.max(0, Math.sin(t * 0.0065)), 3) * 0.28 : 0;
+      const tl = Math.min(1, base + 0.08 * Math.sin(t * 0.0041) + kick);
+      const tr = Math.min(1, base + 0.08 * Math.sin(t * 0.0041 + 0.9) + kick * 0.9);
+      vu.l += (tl - vu.l) * 0.25; vu.r += (tr - vu.r) * 0.25;
+      vu.pl = Math.max(vu.l, vu.pl - 0.004); vu.pr = Math.max(vu.r, vu.pr - 0.004);
+      gv.font = '9px ui-monospace, monospace'; gv.textBaseline = 'middle';
       /** @type {[number, number, string][]} */
       ([[vu.l, vu.pl, 'L'], [vu.r, vu.pr, 'R']]).forEach(([val, peak, lbl], row) => {
-        const y = row * (rowH + 4);
-        gv.fillStyle = '#c7892b'; gv.font = '8px monospace'; gv.fillText(lbl, 0, y + rowH - 1);
-        const lit = Math.round(val * segs), pkSeg = Math.round(peak * segs);
-        for (let s = 0; s < segs; s++) {
-          const f = s / segs;
-          const on = s < lit || s === pkSeg - 1;
-          gv.globalAlpha = on ? 0.95 : 0.1;
-          gv.fillStyle = f > 0.88 ? '#ff4a3a' : f > 0.7 ? '#ffc04a' : '#ffa62b';
-          gv.fillRect(10 + s * segW, y, segW - 1.5, rowH);
+        const y = 3 + row * 9, bw = vw - 16;
+        gv.fillStyle = 'rgba(255,180,60,0.25)'; gv.fillText(lbl, 0, y + 2);
+        for (let i = 0; i < 24; i++) {
+          const f = i / 24, on = val > f;
+          gv.fillStyle = !on ? 'rgba(255,180,60,0.08)' : f > 0.84 ? '#ff5a4a' : '#ffb43a';
+          gv.fillRect(12 + i * (bw / 24), y, bw / 24 - 1, 5);
         }
-        gv.globalAlpha = 1;
+        gv.fillStyle = '#ffe0a0'; gv.fillRect(12 + peak * bw - 1, y - 1, 2, 7);
       });
-
-      const beat = active && partyOn ? (0.4 + 0.6 * Math.abs(Math.sin(t * 4))) : 0;
-      shell.style.setProperty('--beat', beat.toFixed(3));
-      raf = requestAnimationFrame(draw);
     };
-    cancelAnimationFrame(raf);
-    raf = requestAnimationFrame(draw);
+
+    const loop = (t) => { drawSpec(t); drawVu(t); raf = requestAnimationFrame(loop); };
+    raf = requestAnimationFrame(loop);
   };
 
+  const lampStyle = (on, color, borderOn, shadow, extra = {}) => ({
+    fontSize: 8, border: `1px solid ${on ? borderOn : colors.amberDim}`, padding: '1px 5px',
+    borderRadius: 3, opacity: on ? 1 : 0.25, letterSpacing: 1, color: on ? color : colors.amber,
+    textShadow: on ? shadow : 'none', transition: 'opacity .25s ease', ...extra,
+  });
+
   const shell = Container({
-    tag: 'section',
     unstyled: true,
     className: 'display' + (party ? ' party' : '') + (playing ? ' on' : ''),
     ref: (el) => { shellRef = el; startDraw(); },
+    background: 'radial-gradient(ellipse at 50% 0%, #22180a, #120d06 70%)',
+    borderRadius: 12, border: '1px solid #000',
+    boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.05)',
+    padding: '10px 12px 8px', fontFamily: fonts.mono, color: colors.amber,
+    textShadow: `0 0 6px ${colors.amberGlow}`, position: 'relative',
     children: [
       Container({
-        unstyled: true,
-        className: 'display-top',
+        unstyled: true, className: 'display-top',
+        display: 'flex', alignItems: 'center', gap: 8,
         children: [
-          Text({ unstyled: true, tag: 'span', className: 'state' + (playing ? ' blink' : ''), text: playing ? '▶' : title ? '❚❚' : '■' }),
-          Text({ unstyled: true, tag: 'span', className: 'clock', text: clock, onPress: onToggleTime }),
+          Text({ unstyled: true, tag: 'span', className: 'state' + (playing ? ' blink' : ''), text: playing ? '▶' : '❚❚', width: 14, fontSize: 12 }),
+          Text({ unstyled: true, tag: 'span', className: 'clock', text: clock, fontSize: 38, fontWeight: '700', letterSpacing: 1, fontVariantNumeric: 'tabular-nums', onPress: onToggleTime }),
           Container({
-            unstyled: true,
-            className: 'lamps',
+            unstyled: true, className: 'lamps',
+            marginLeft: 'auto', display: 'flex', flexDirection: 'column', gap: 3, alignItems: 'flex-end',
             children: [
-              Text({ unstyled: true, tag: 'span', className: 'lamp' + (source === 'cloud' ? ' on blue' : ''), text: 'NUBE' }),
-              Text({ unstyled: true, tag: 'span', className: 'lamp' + (source === 'local' ? ' on' : ''), text: 'EN EL TELÉFONO' }),
-              Text({ unstyled: true, tag: 'span', className: 'lamp' + (mixing ? ' on green' : ''), text: 'MEZCLANDO' }),
-              Text({ unstyled: true, tag: 'span', className: 'lamp' + (offline ? ' on red' : ''), text: 'SIN SEÑAL' }),
+              Text({ unstyled: true, tag: 'span', className: 'lamp green' + (offline ? ' on' : ''), text: 'LOCAL', ...lampStyle(offline, '#7ddc8a', '#2c5a33', '0 0 6px rgba(125,220,138,0.6)') }),
+              Text({ unstyled: true, tag: 'span', className: 'lamp blue' + (source === 'cloud' ? ' on' : ''), text: 'NUBE', ...lampStyle(source === 'cloud', colors.blue, '#35547a', '0 0 6px rgba(120,180,255,0.6)') }),
+              Text({ unstyled: true, tag: 'span', className: 'lamp red' + (mixing ? ' on' : ''), text: 'MIX', ...lampStyle(mixing, colors.red, '#7a2a22', '0 0 6px rgba(255,90,74,0.6)') }),
             ],
           }),
         ],
       }),
+      Canvas({ className: 'vu', width: 400, height: 18, ref: (el) => { vuRef = el; startDraw(); } }),
       Container({
-        unstyled: true,
-        className: 'marquee',
+        unstyled: true, className: 'marquee',
+        overflow: 'hidden', whiteSpace: 'nowrap', fontSize: 13, borderBottom: `1px dashed ${colors.amberDim}`, padding: '6px 0 4px',
         onPress: onExpand,
-        child: Text({
-          unstyled: true,
-          tag: 'span',
-          className: 'track-in' + (title && title.length > 34 ? ' scroll' : ''),
-          text: title || 'PIXEL DECK · ELIGE UNA CANCIÓN',
-        }),
+        child: Text({ unstyled: true, tag: 'span', className: 'track-in', text: title, display: 'inline-block' }),
       }),
-      Canvas({ className: 'meter', ref: (el) => { specRef = el; startDraw(); } }),
-      Canvas({ className: 'vu', ref: (el) => { vuRef = el; startDraw(); } }),
-      Text({ unstyled: true, tag: 'div', className: 'party-tag', text: 'MODO FIESTA', display: party ? 'block' : 'none' }),
+      Canvas({ className: 'meter', width: 400, height: 40, ref: (el) => { specRef = el; startDraw(); } }),
+      Text({ unstyled: true, tag: 'div', className: 'party-tag', text: 'MODO FIESTA', position: 'absolute', right: 12, bottom: 6, fontSize: 8, letterSpacing: 2, color: colors.amber, textShadow: `0 0 6px ${colors.amberGlow}`, display: party ? 'block' : 'none' }),
     ],
   });
 
+  shell._cleanup = () => { if (raf) cancelAnimationFrame(raf); };
   return shell;
 }
