@@ -315,9 +315,9 @@ export const PlayerScreen = () => {
   appEl.appendChild(soundSheet);
   appEl.appendChild(audio);
 
-  const tabBtns = tabsWrap.querySelectorAll('.tab');
-  if (tabBtns[0]) tabBtns[0].dataset.tab = 'cloud';
-  if (tabBtns[1]) tabBtns[1].dataset.tab = 'downloads';
+  const tabBtns = tabsWrap?.querySelectorAll('.tab');
+  if (tabBtns?.[0]) tabBtns[0].dataset.tab = 'cloud';
+  if (tabBtns?.[1]) tabBtns[1].dataset.tab = 'downloads';
 
   rerenderPlaylist();
   syncPlayer();
