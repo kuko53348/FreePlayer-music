@@ -3,3 +3,4 @@ export { RootScreen } from './RootScreen.js';
 export { HomeScreen } from './HomeScreen.js';
 export { AboutScreen } from './AboutScreen.js';
 export { ProfileScreen } from './ProfileScreen.js';
+export { SettingsScreen } from './SettingsScreen.js';

@@ -1,4 +1,4 @@
-import { Audio, Container, Text, Button, Input, RangeInput } from 'flet-box';
+import { Audio, Container, Text, Button, Input, RangeInput, goTo } from 'flet-box';
 import { Display } from '../components/Display.js';
 import { SoundSheet } from '../components/SoundSheet.js';
 import { VirtualList } from '../components/VirtualList.js';
@@ -302,7 +302,7 @@ export const PlayerScreen = () => {
             children: [
               Button({ unstyled: true, className: 'tab on', text: '☁ NUBE', height: 34, padding: '0 12px', borderRadius: '9px 9px 0 0', border: '1px solid #000', borderBottom: 'none', fontSize: 11, letterSpacing: 1.2, fontWeight: '800', onPress: () => { tab = 'cloud'; rerenderPlaylist(); } }),
               Button({ unstyled: true, className: 'tab', text: '↓ DESCARGAS (4)', height: 34, padding: '0 12px', borderRadius: '9px 9px 0 0', border: '1px solid #000', borderBottom: 'none', fontSize: 11, letterSpacing: 1.2, fontWeight: '800', onPress: () => { tab = 'downloads'; rerenderPlaylist(); } }),
-              Button({ unstyled: true, className: 'tab cfg', text: '⚙', height: 34, padding: '0 12px', borderRadius: '9px 9px 0 0', border: '1px solid #000', borderBottom: 'none', fontSize: 15, marginLeft: 'auto', onPress: () => {} }),
+              Button({ unstyled: true, className: 'tab cfg', text: '⚙', height: 34, padding: '0 12px', borderRadius: '9px 9px 0 0', border: '1px solid #000', borderBottom: 'none', fontSize: 15, marginLeft: 'auto', onPress: () => goTo('/settings') }),
             ],
           }),
           Container({
